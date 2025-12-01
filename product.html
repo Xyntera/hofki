@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HOFKI • Product</title>
 
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -31,6 +32,7 @@
     }
   </script>
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
@@ -69,7 +71,9 @@
     </footer>
   </div>
 
+  <!-- Config with API + WhatsApp number -->
   <script src="config.js"></script>
+
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -214,6 +218,7 @@
 
     function setupOrderForm(product) {
       const form = document.getElementById('order-form');
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -224,25 +229,26 @@
         const phone = formData.get('phone');
         const address = formData.get('address');
 
-        const orderPayload = {
-          product_id: product.id,
-          product_name: product.name,
-          variant,
-          quantity,
-          customer_name,
-          phone,
-          address
-        };
+        // Build form-encoded body for Apps Script
+        const params = new URLSearchParams();
+        params.append('product_id', product.id);
+        params.append('product_name', product.name);
+        params.append('variant', variant);
+        params.append('quantity', quantity);
+        params.append('customer_name', customer_name);
+        params.append('phone', phone);
+        params.append('address', address);
 
         try {
           const res = await fetch(window.HOFKI_CONFIG.ORDER_API(), {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderPayload)
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
           });
+
           const data = await res.json();
           if (!data.success) {
-            alert('Could not create order. Please try again or message us on Instagram.');
+            alert('Could not create order. Please try again or contact us directly.');
             return;
           }
 
