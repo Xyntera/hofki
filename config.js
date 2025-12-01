@@ -1,14 +1,17 @@
 window.HOFKI_CONFIG = {
-  SCRIPT_BASE: 'https://script.google.com/macros/s/AKfycbwh0SJU28gdRTpERDEEg8BCuo8V2X6--lqi3R2EE3Ce-Pd6P9RGfPpID1QZi1ujG9ZJ1g/exec',
+  // USE THE GOOGLEUSERCONTENT.COM ECHO URL HERE
+  // (no &type=... at the end, just as you copied it)
+  SCRIPT_BASE: 'https://script.googleusercontent.com/macros/echo?user_content_key=XXXX&lib=YYYY',
 
   PRODUCTS_API() {
-    return this.SCRIPT_BASE + '?type=products';
+    // base already has query params, so append with &type=
+    return this.SCRIPT_BASE + '&type=products';
   },
 
   ORDER_API() {
-    return this.SCRIPT_BASE + '?type=order';
+    return this.SCRIPT_BASE + '&type=order';
   },
 
-  // Your WhatsApp number (no +, with country code)
-  WHATSAPP_NUMBER: '919072490114'
+  // Your WhatsApp number (no + sign, with country code)
+  WHATSAPP_NUMBER: '917510660614'
 };
