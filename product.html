@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOFKI • Product</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            hofki: {
+              terracotta: '#D4A574',
+              sand: '#E3D6C4',
+              cream: '#F7F3EC',
+              charcoal: '#2E2721',
+              olive: '#8A8F6A',
+            }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 18px 45px rgba(15, 23, 42, 0.12)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-hofki-cream text-hofki-charcoal font-sans antialiased">
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="border-b border-hofki-sand/70 bg-hofki-cream/95">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-9 h-9 border border-hofki-charcoal/15 rounded-full text-xs tracking-[0.22em] font-medium">
+            HK
+          </span>
+          <div class="flex flex-col leading-tight">
+            <span class="font-serif text-lg tracking-[0.18em] uppercase">HOFKI</span>
+            <span class="text-[11px] uppercase tracking-[0.28em] text-hofki-charcoal/60">
+              Every pattern tells a story
+            </span>
+          </div>
+        </a>
+      </div>
+    </header>
+
+    <main class="flex-1">
+      <section class="pt-6 pb-14">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div id="product-root" class="text-sm">
+            <p class="text-hofki-charcoal/70">Loading piece…</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="py-6 text-[11px] text-hofki-charcoal/60 text-center">
+      © <span id="year"></span> HOFKI.
+    </footer>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function getQueryParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    async function loadProductPage() {
+      const slug = getQueryParam('slug');
+      const root = document.getElementById('product-root');
+      if (!slug) {
+        root.innerHTML = '<p>No product selected.</p>';
+        return;
+      }
+
+      try {
+        const res = await fetch(window.HOFKI_CONFIG.PRODUCTS_API());
+        const data = await res.json();
+        const product = (data.products || []).find(p => String(p.slug) === slug);
+
+        if (!product) {
+          root.innerHTML = '<p class="text-red-500">Product not found.</p>';
+          return;
+        }
+
+        const gallery = product.gallery_image_urls && product.gallery_image_urls.length
+          ? product.gallery_image_urls
+          : [product.main_image_url];
+
+        const mainImg = gallery[0];
+
+        root.innerHTML = `
+          <div class="grid lg:grid-cols-2 gap-10 lg:gap-12">
+            <div>
+              <div class="aspect-[4/5] rounded-3xl bg-hofki-sand/60 border border-hofki-sand shadow-soft overflow-hidden mb-4">
+                <img id="mainImage" src="${mainImg}" alt="${product.name}" class="w-full h-full object-cover" />
+              </div>
+              <div class="grid grid-cols-4 gap-3">
+                ${gallery.map((url, i) => `
+                  <button
+                    class="thumb border ${i === 0 ? 'border-hofki-charcoal/60' : 'border-hofki-sand'} rounded-2xl overflow-hidden aspect-square focus:outline-none"
+                    data-image="${url}">
+                    <img src="${url}" alt="" class="w-full h-full object-cover" />
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="space-y-5">
+              <div class="space-y-2">
+                <p class="text-[11px] uppercase tracking-[0.26em] text-hofki-charcoal/60">
+                  ${product.type === 'rug' ? 'RUG' : product.type === 'set' ? 'SET' : 'CERAMIC PLATE'}
+                </p>
+                <h1 class="font-serif text-2xl sm:text-3xl">
+                  ${product.name}
+                </h1>
+                <p class="text-sm text-hofki-charcoal/80 max-w-md">
+                  ${product.short_story || ''}
+                </p>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span class="text-lg font-medium">₹${product.price_inr || ''}</span>
+                  <span class="text-xs text-hofki-charcoal/70">Inclusive of all taxes</span>
+                </div>
+              </div>
+
+              <form id="order-form" class="space-y-4 pt-2">
+                <div>
+                  <p class="text-xs font-medium mb-2">Option</p>
+                  <select name="variant" class="w-full border border-hofki-sand rounded-full px-3 py-2 text-xs bg-white">
+                    <option value="Single">Single</option>
+                    <option value="Set of 2">Set of 2</option>
+                    <option value="Set of 4">Set of 4</option>
+                  </select>
+                </div>
+
+                <div class="flex gap-4">
+                  <div>
+                    <p class="text-xs font-medium mb-2">Quantity</p>
+                    <input type="number" name="quantity" value="1" min="1"
+                      class="w-20 border border-hofki-sand rounded-full px-3 py-2 text-sm bg-white" />
+                  </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <p class="text-xs font-medium mb-1">Your name</p>
+                    <input name="customer_name" required class="w-full border border-hofki-sand rounded-full px-3 py-2 text-sm bg-white" />
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium mb-1">Phone (WhatsApp)</p>
+                    <input name="phone" required class="w-full border border-hofki-sand rounded-full px-3 py-2 text-sm bg-white" />
+                  </div>
+                </div>
+
+                <div>
+                  <p class="text-xs font-medium mb-1">Address</p>
+                  <textarea name="address" required rows="3" class="w-full border border-hofki-sand rounded-2xl px-3 py-2 text-sm bg-white"></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-medium bg-hofki-charcoal text-white shadow-soft hover:brightness-110 transition-all">
+                  Order via WhatsApp
+                </button>
+                <p class="text-[11px] text-hofki-charcoal/65">
+                  We’ll receive your order details on WhatsApp along with a tracking link.
+                </p>
+              </form>
+
+              <div class="pt-2 text-xs text-hofki-charcoal/70">
+                ${product.details || ''}
+              </div>
+            </div>
+          </div>
+        `;
+
+        setupGallery();
+        setupOrderForm(product);
+      } catch (err) {
+        console.error(err);
+        root.innerHTML = '<p class="text-red-500">Could not load product.</p>';
+      }
+    }
+
+    function setupGallery() {
+      const mainImage = document.getElementById('mainImage');
+      const thumbs = document.querySelectorAll('.thumb');
+      thumbs.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const img = btn.getAttribute('data-image');
+          if (!img) return;
+          mainImage.src = img;
+          thumbs.forEach(b => b.classList.remove('border-hofki-charcoal/60'));
+          btn.classList.add('border-hofki-charcoal/60');
+        });
+      });
+    }
+
+    function setupOrderForm(product) {
+      const form = document.getElementById('order-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const variant = formData.get('variant');
+        const quantity = formData.get('quantity') || '1';
+        const customer_name = formData.get('customer_name');
+        const phone = formData.get('phone');
+        const address = formData.get('address');
+
+        const orderPayload = {
+          product_id: product.id,
+          product_name: product.name,
+          variant,
+          quantity,
+          customer_name,
+          phone,
+          address
+        };
+
+        try {
+          const res = await fetch(window.HOFKI_CONFIG.ORDER_API(), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderPayload)
+          });
+          const data = await res.json();
+          if (!data.success) {
+            alert('Could not create order. Please try again or message us on Instagram.');
+            return;
+          }
+
+          const trackingUrl = data.tracking_url;
+          const orderId = data.order_id;
+          const waNumber = window.HOFKI_CONFIG.WHATSAPP_NUMBER;
+
+          const message = `
+New HOFKI order
+
+Order ID: ${orderId}
+Item: ${product.name}
+Option: ${variant}
+Qty: ${quantity}
+
+Customer: ${customer_name}
+Phone: ${phone}
+Address:
+${address}
+
+Tracking link:
+${trackingUrl}
+          `.trim();
+
+          const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+          window.open(waUrl, '_blank');
+        } catch (err) {
+          console.error(err);
+          alert('Something went wrong. Please try again or contact us directly.');
+        }
+      });
+    }
+
+    loadProductPage();
+  </script>
+</body>
+</html>
