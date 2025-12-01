@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOFKI • Every pattern tells a story</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            hofki: {
+              terracotta: '#D4A574',
+              sand: '#E3D6C4',
+              cream: '#F7F3EC',
+              charcoal: '#2E2721',
+              olive: '#8A8F6A',
+            }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 18px 45px rgba(15, 23, 42, 0.12)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-hofki-cream text-hofki-charcoal font-sans antialiased">
+  <div class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-30 bg-hofki-cream/95 border-b border-hofki-sand/70">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <a href="#" class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-9 h-9 border border-hofki-charcoal/15 rounded-full text-xs tracking-[0.22em] font-medium">
+            HK
+          </span>
+          <div class="flex flex-col leading-tight">
+            <span class="font-serif text-lg tracking-[0.18em] uppercase">HOFKI</span>
+            <span class="text-[11px] uppercase tracking-[0.28em] text-hofki-charcoal/60">
+              Every pattern tells a story
+            </span>
+          </div>
+        </a>
+      </div>
+    </header>
+
+    <main class="flex-1">
+      <!-- Hero -->
+      <section class="pt-10 pb-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-center">
+          <div class="space-y-5">
+            <p class="text-xs tracking-[0.3em] uppercase text-hofki-charcoal/60">
+              CERAMIC PLATES · RUGS · OBJECTS
+            </p>
+            <h1 class="font-serif text-4xl sm:text-5xl leading-tight">
+              Every pattern tells a story.
+            </h1>
+            <p class="text-base text-hofki-charcoal/80 max-w-md">
+              Handpicked rugs, ceramic plates and decor curated for homes that love detail, texture and warmth.
+            </p>
+            <div class="flex flex-wrap gap-3 pt-2">
+              <a href="#featured" class="px-6 py-3 rounded-full text-sm font-medium bg-hofki-terracotta text-white shadow-soft">
+                Shop featured pieces
+              </a>
+            </div>
+          </div>
+          <div class="aspect-[4/3] rounded-3xl bg-hofki-sand/80 border border-hofki-sand shadow-soft overflow-hidden">
+            <!-- Replace with your real hero image -->
+            <img src="https://via.placeholder.com/900x675?text=HOFKI+Hero" class="w-full h-full object-cover" alt="HOFKI hero" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured products from Google Sheet -->
+      <section id="featured" class="py-12 border-t border-hofki-sand/70 bg-white/70">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-end justify-between mb-6">
+            <div>
+              <p class="text-xs tracking-[0.28em] uppercase text-hofki-charcoal/60 mb-2">
+                FEATURED PIECES
+              </p>
+              <h2 class="font-serif text-2xl">
+                A few current favourites.
+              </h2>
+            </div>
+          </div>
+
+          <div id="featured-products" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            <p class="text-sm text-hofki-charcoal/70 col-span-full">Loading pieces…</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-6 text-[11px] text-hofki-charcoal/60 text-center">
+      © <span id="year"></span> HOFKI. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+  <script src="config.js"></script>
+  <script>
+    async function loadFeaturedProducts() {
+      const container = document.getElementById('featured-products');
+      try {
+        const res = await fetch(window.HOFKI_CONFIG.PRODUCTS_API());
+        const data = await res.json();
+        const featured = (data.products || []).filter(p => p.is_featured).slice(0, 6);
+
+        if (!featured.length) {
+          container.innerHTML = '<p class="text-sm text-hofki-charcoal/70">New arrivals coming soon.</p>';
+          return;
+        }
+
+        container.innerHTML = featured.map(p => {
+          const img = p.main_image_url || 'https://via.placeholder.com/900x1100?text=HOFKI';
+          const price = p.price_inr ? `₹${p.price_inr}` : '';
+          const typeLabel =
+            p.type === 'rug' ? 'Rug' :
+            p.type === 'set' ? 'Set' :
+            'Ceramic';
+
+          return `
+            <article class="group rounded-3xl border border-hofki-sand bg-hofki-cream/60 hover:bg-hofki-cream/90 transition-all overflow-hidden shadow-sm hover:shadow-soft">
+              <a href="product.html?slug=${encodeURIComponent(p.slug)}" class="block">
+                <div class="relative aspect-[4/5] overflow-hidden">
+                  <img src="${img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform" />
+                  <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/85 text-[11px] uppercase tracking-[0.18em]">
+                    ${typeLabel}
+                  </span>
+                </div>
+                <div class="p-4 sm:p-4.5">
+                  <h3 class="text-sm font-medium mb-1.5">${p.name}</h3>
+                  <p class="text-xs text-hofki-charcoal/70 mb-2">${p.short_story || ''}</p>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-medium">${price}</span>
+                    <span class="text-hofki-charcoal/60">View details</span>
+                  </div>
+                </div>
+              </a>
+            </article>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<p class="text-sm text-red-500">Could not load products.</p>';
+      }
+    }
+
+    loadFeaturedProducts();
+  </script>
+</body>
+</html>
