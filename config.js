@@ -11,5 +11,5 @@ window.HOFKI_CONFIG = {
   },
 
   // your WhatsApp number (no +, include country code)
-  WHATSAPP_NUMBER: "91XXXXXXXXXX"
+  WHATSAPP_NUMBER: "917510660614"
 };
