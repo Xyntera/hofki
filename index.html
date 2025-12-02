@@ -41,7 +41,7 @@
     <!-- Header -->
     <header class="sticky top-0 z-30 bg-hofki-cream/95 border-b border-hofki-sand/70">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <a href="#" class="flex items-center gap-2">
+        <a href="index.html" class="flex items-center gap-2">
           <span class="inline-flex items-center justify-center w-9 h-9 border border-hofki-charcoal/15 rounded-full text-xs tracking-[0.22em] font-medium">
             HK
           </span>
@@ -76,13 +76,12 @@
             </div>
           </div>
           <div class="aspect-[4/3] rounded-3xl bg-hofki-sand/80 border border-hofki-sand shadow-soft overflow-hidden">
-            <!-- Replace with your real hero image -->
             <img src="https://via.placeholder.com/900x675?text=HOFKI+Hero" class="w-full h-full object-cover" alt="HOFKI hero" />
           </div>
         </div>
       </section>
 
-      <!-- Featured products from Google Sheet -->
+      <!-- Featured products -->
       <section id="featured" class="py-12 border-t border-hofki-sand/70 bg-white/70">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-end justify-between mb-6">
@@ -103,17 +102,15 @@
       </section>
     </main>
 
-    <!-- Footer -->
     <footer class="py-6 text-[11px] text-hofki-charcoal/60 text-center">
       © <span id="year"></span> HOFKI. All rights reserved.
     </footer>
   </div>
 
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
   <script src="config.js"></script>
   <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
     async function loadFeaturedProducts() {
       const container = document.getElementById('featured-products');
       try {
